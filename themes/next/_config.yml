@@ -220,9 +220,9 @@ post_wordcount:
 
 # Reward
 reward_comment: 小主，求您多少赏点儿~
-wechatpay: /images/weixin_pay.jpg 
-alipay: /images/zhifubao_pay.jpg 
-bitcoin: /images/jd_pay.jpg 
+wechatpay: /images/weixin_pay.png 
+alipay: /images/zhifubao_pay.png 
+bitcoin: /images/jd_pay.png 
 
 # Declare license on posts
 post_copyright:
