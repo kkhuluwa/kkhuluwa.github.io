@@ -7,22 +7,22 @@
 
     {% if theme.wechatpay %}
       <div id="wechat" style="display: inline-block">
-        <img id="wechat_qr" src="{{ theme.wechatpay }}" alt="{{ theme.author }} WeChat Pay"/>
-        <p>WeChat Pay</p>
+        <img id="wechat_qr" src="{{ theme.wechatpay }}" alt="{{ theme.author }} wechat"/>
+        <p>微信支付</p>
       </div>
     {% endif %}
 
     {% if theme.alipay %}
       <div id="alipay" style="display: inline-block">
         <img id="alipay_qr" src="{{ theme.alipay }}" alt="{{ theme.author }} Alipay"/>
-        <p>Alipay</p>
+        <p>支付宝</p>
       </div>
     {% endif %}
 
     {% if theme.bitcoin %}
       <div id="bitcoin" style="display: inline-block">
         <img id="bitcoin_qr" src="{{ theme.bitcoin }}" alt="{{ theme.author }} Bitcoin"/>
-        <p>Bitcoin</p>
+        <p>京东支付</p>
       </div>
     {% endif %}
 
