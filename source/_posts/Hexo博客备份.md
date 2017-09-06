@@ -1,0 +1,59 @@
+---
+title: Hexo博客备份
+date: 2017-09-06 15:42:21
+tags: Hexo
+---
+使用Hexo在github搭建的博客，博客作为一个单独的GitHub仓库存在，但是这个仓库只有生成的静态网页文件，并没有Hexo的源文件，如果要换电脑或者重装系统后，就比较麻烦了。
+
+看别人的操作，有一个非常巧妙的方法，利用git新建一个分支，将源码提交在分支上，这样master就是静态的blog文件，新分支是自己的blog源码，太巧妙了，在此惊叹一分钟。
+
+<!-- more -->
+
+### 备份
+1. 创建仓库kkhuluwa.github.io，如果同名仓库之前已经创建，请将之前的仓库改名，新建的仓库必须是Username.github.io
+2. 创建两个分支：master和hexo
+3. 切换hexo分支
+4. 将刚刚创建的新仓库clone至本地，将之前的hexo文件夹中的_config.yml，themes/，source/，scaffolds/，package.json，.gitignore复制至kkhuluwa.github.io文件夹
+5. 将themes/next/(我用的是NexT主题)中的.git/删除，否则无法将主题文件夹push(非常重要)
+6. 在kkhuluwa.github.io文件夹执行npm install和npm install hexo-deployer-git（这里可以看一看分支是不是显示为hexo）
+7. 执行git add .、git commit -m "XXX"、git push origin hexo来提交hexo网站源文件
+8. 执行hexo g -d生成静态网页部署至Github上
+
+>这样仓库就有master分支和hexo分支，分别保存静态网页和源文件了！
+
+### 修改
+1. 依次执行git add .、git commit -m ""、git push origin hexo来提交hexo网站源文件
+2. 执行hexo g -d生成静态网页部署至Github上
+
+即重复备份的7-8步骤，以上两部没有严格的顺序
+### 恢复
+重装电脑后，或者在其它电脑上想修改博客
+1. 安装git
+2. 安装Nodejs和npm
+3. 使用git clone git@github.com:kkhuluwa/kkhuluwa.github.io.git将仓库拷贝至本地
+4. 在文件夹内执行以下命令npm install hexo-cli -g、npm install、npm install hexo-deployer-git
+5. 切换到hexo分支
+6. 重复 **修改**的步骤
+
+### 附录
+**添加ssh-keys**
+1. 在终端下运行：ssh-keygen -t rsa -C "yourname@email.com"，一路回车
+2. 会在.ssh目录生成id_rsa、id_rsa.pub两个文件，这就是密钥对，id_rsa是私钥，千万不能泄漏出去
+3. 登录Github，打开「Settings」-->「SSH and GPG keys」，然后点击「new SSH key」，填上任意Title，在Key文本框里粘贴公钥id_rsa.pub文件的内容，注意不要粘贴成id_rsa，最后点击「Add SSH Key」
+**hexo源文件**
+1. _config.yml站点的配置文件，需要拷贝；
+2. themes/主题文件夹，需要拷贝；
+3. source博客文章的.md文件，需要拷贝；
+4. scaffolds/文章的模板，需要拷贝；
+5. package.json安装包的名称，需要拷贝；
+6. .gitignore限定在push时哪些文件可以忽略，需要拷贝；
+7. .git/主题和站点都有，标志这是一个git项目，不需要拷贝；
+8. node_modules/是安装包的目录，在执行npm install的时候会重新生成，不需要拷贝；
+9. public是hexo g生成的静态网页，不需要拷贝；
+10. .deploy_git同上，hexo g也会生成，不需要拷贝；
+11. db.json文件，不需要拷贝。
+
+其实不需要拷贝的文件正是.gitignore中所忽略的
+
+### refer
+>[Hexo博客备份](http://www.jianshu.com/p/57b5a384f234)
