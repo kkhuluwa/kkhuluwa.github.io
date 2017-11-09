@@ -102,7 +102,7 @@
 <meta property="og:site_name" content="KK葫芦娃">
 <meta property="og:description" content="Android DID 问题Android DID,全称是Android Device ID，及Android设备的唯一标识id。Android中系统中并没有可靠获取设备唯一id的方法，这个是业内的一种无奈，最主要的原因，应该是各家厂商以及不同的Android版本。">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2017-11-08T16:05:46.600Z">
+<meta property="og:updated_time" content="2017-11-09T07:53:52.579Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="2017-11-8 Android唯一设备id分析">
 <meta name="twitter:description" content="Android DID 问题Android DID,全称是Android Device ID，及Android设备的唯一标识id。Android中系统中并没有可靠获取设备唯一id的方法，这个是业内的一种无奈，最主要的原因，应该是各家厂商以及不同的Android版本。">
@@ -409,14 +409,18 @@
 <p>优点：</p>
 <ol>
 <li>Android 2.3可以获取，非手机设备可以通过该接口获取。</li>
-<li>不需要动态申请权限<br>缺点</li>
+<li>不需要动态申请权限</li>
+</ol>
+<p>缺点</p>
+<ol>
 <li>在少数的一些设备上，会返回垃圾数据（比例有多少，网上没有大规模的调研数据）。</li>
 </ol>
 <p>装有SIM卡的设备获取办法：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">getSystemService(Context.TELEPHONY_SERVIEC).getSimSerialNumber();</div></pre></td></tr></table></figure></p>
 <p>有文章说，该id就是IMEI,因此对于CMDA电信设备，获取数值为null</p>
 <h3 id="ANDROID-ID"><a href="#ANDROID-ID" class="headerlink" title="ANDROID_ID"></a>ANDROID_ID</h3><p>在设备首次启动时，系统会随机生成一个64位的数字，并把这个数字以16进制字符串的形式保存下来，这个16进制的字符串就是ANDROID_ID，当设备被恢复出厂设置后该值会被重置。</p>
 <p>可以通过下面的方法获取：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">import android.provider.Settings;   </div><div class="line">String ANDROID_ID = Settings.System.getString(getContentResolver(), Settings.System.ANDROID_ID);</div></pre></td></tr></table></figure></p>
-<p>优点：<br>1.android系统版本在非2.2系统上，都是非常可靠的<br>2.不需要获取权限<br>缺点：</p>
+<p>优点：<br>1.android系统版本在非2.2系统上，都是非常可靠的<br>2.不需要获取权限</p>
+<p>缺点：</p>
 <ol>
 <li>Android2.2系统上不可靠（还好，现在的设备基本都在4.0以上）</li>
 <li>厂商定制系统的Bug：不同的设备可能会产生相同的ANDROID_ID：9774d56d682e549c。(摩托罗拉好像出现过这个问题)</li>
@@ -430,7 +434,10 @@
 <p>优点：</p>
 <ol>
 <li>不需要权限</li>
-<li>每当一个应用安装后即可获得。<br>缺点</li>
+<li>每当一个应用安装后即可获得。</li>
+</ol>
+<p>缺点</p>
+<ol>
 <li>删除应用重新安装后id变更。</li>
 </ol>
 <p>画个图总结下吧，看图</p>
@@ -503,11 +510,11 @@
 <p>该方案为友盟SDK主导设计，具体使用场景为各个APP嵌入友盟SDK，utdid可以在多个APP中进行维护，在使用的有友盟、虾米音乐、阿里小智、老版本的支付宝、淘宝等。</p>
 <p>优点：</p>
 <ol>
-<li><p>多APP维护该设备id，并且在多应用中可以维护<br>缺点：<br>utdid开发手册中是强制需要下面3个权限的：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">&lt;uses-permission android:name=&quot;android.permission.WRITE_EXTERNAL_STORAGE&quot; /&gt; </div><div class="line">&lt;uses-permission android:name=&quot;android.permission.WRITE_SETTINGS&quot; /&gt; </div><div class="line">&lt;uses-permission android:name=&quot;android.permission.READ_PHONE_STATE&quot; /&gt;</div></pre></td></tr></table></figure>
-</li>
-<li><p><strong>WRITE_SETTINGS</strong><br>targetSDK使用23(6.0)以后，即使申请了WRITE_SETTINGS权限，再想写settings中的数据会抛出了如下异常。<br>IllegalArgumentException: You cannot keep your settings in the secure settings.<br>想写Setting.System中的数据也已经没有权限了，即使想修改Settings.Global也需要是系统应用。</p>
-</li>
+<li>多APP维护该设备id，并且在多应用中可以维护</li>
+</ol>
+<p>缺点：<br>utdid开发手册中是强制需要下面3个权限的：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">&lt;uses-permission android:name=&quot;android.permission.WRITE_EXTERNAL_STORAGE&quot; /&gt; </div><div class="line">&lt;uses-permission android:name=&quot;android.permission.WRITE_SETTINGS&quot; /&gt; </div><div class="line">&lt;uses-permission android:name=&quot;android.permission.READ_PHONE_STATE&quot; /&gt;</div></pre></td></tr></table></figure></p>
+<ol>
+<li><strong>WRITE_SETTINGS</strong><br>targetSDK使用23(6.0)以后，即使申请了WRITE_SETTINGS权限，再想写settings中的数据会抛出了如下异常。<br>IllegalArgumentException: You cannot keep your settings in the secure settings.<br>想写Setting.System中的数据也已经没有权限了，即使想修改Settings.Global也需要是系统应用。</li>
 <li><strong>READ_PHONE_STATE</strong><br>targetSDK使用23以后，需要手动授权。imei作为utdid生成字段的其中一部分，在生成utdid时，如果无法获取就使用随机值代替。这个即使不授权问题也不大。</li>
 <li><strong>WRITE_EXTERNAL_STORAGE</strong><br>targetSDK使用23以后，需要手动授权。在settings中没有写入utdid的情况下，如果没有WRITE_EXTERNAL_STORAGE权限，应用外部的utdid是无法获得的，内部也没有的情况下，那么utdid势必会重新生成了。</li>
 <li>如果settings不能保存，那么应用外就需要寄希望于sdcard的存储。除了权限问题会导致sdcard中的数据无法取得外，三方的手机管理工具也会对sdcard中的数据做清除。（utdid外存储目录用AAA，BBB表示）</li>
