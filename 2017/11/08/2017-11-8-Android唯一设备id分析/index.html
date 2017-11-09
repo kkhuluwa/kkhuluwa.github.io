@@ -1,0 +1,949 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.2" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="Android," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.2" />
+
+
+
+
+
+
+<meta name="description" content="Android DID 问题Android DID,全称是Android Device ID，及Android设备的唯一标识id。Android中系统中并没有可靠获取设备唯一id的方法，这个是业内的一种无奈，最主要的原因，应该是各家厂商以及不同的Android版本。">
+<meta name="keywords" content="Android">
+<meta property="og:type" content="article">
+<meta property="og:title" content="2017-11-8 Android唯一设备id分析">
+<meta property="og:url" content="http://kkhuluwa.github.io/2017/11/08/2017-11-8-Android唯一设备id分析/index.html">
+<meta property="og:site_name" content="KK葫芦娃">
+<meta property="og:description" content="Android DID 问题Android DID,全称是Android Device ID，及Android设备的唯一标识id。Android中系统中并没有可靠获取设备唯一id的方法，这个是业内的一种无奈，最主要的原因，应该是各家厂商以及不同的Android版本。">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2017-11-08T16:05:46.600Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="2017-11-8 Android唯一设备id分析">
+<meta name="twitter:description" content="Android DID 问题Android DID,全称是Android Device ID，及Android设备的唯一标识id。Android中系统中并没有可靠获取设备唯一id的方法，这个是业内的一种无奈，最主要的原因，应该是各家厂商以及不同的Android版本。">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://kkhuluwa.github.io/2017/11/08/2017-11-8-Android唯一设备id分析/"/>
+
+
+
+
+
+  <title>2017-11-8 Android唯一设备id分析 | KK葫芦娃</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+<a href="https://github.com/kkhuluwa"><img style="position: absolute; top: 0; left: 0; border: 0;" src="https://camo.githubusercontent.com/8b6b8ccc6da3aa5722903da7b58eb5ab1081adee/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f6c6566745f6f72616e67655f6666373630302e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_left_orange_ff7600.png"></a>
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">KK葫芦娃</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">叮叮当当咚咚当当</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://kkhuluwa.github.io/2017/11/08/2017-11-8-Android唯一设备id分析/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="KK葫芦娃">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="KK葫芦娃">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">2017-11-8 Android唯一设备id分析</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-11-08T23:57:59+08:00">
+                2017-11-08
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+            <div class="post-wordcount">
+              
+                
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-file-word-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">字数统计&#58;</span>
+                
+                <span title="字数统计">
+                  3,816
+                </span>
+              
+
+              
+                <span class="post-meta-divider">|</span>
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-clock-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">阅读时长 &asymp;</span>
+                
+                <span title="阅读时长">
+                  15
+                </span>
+              
+            </div>
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="Android-DID-问题"><a href="#Android-DID-问题" class="headerlink" title="Android DID 问题"></a>Android DID 问题</h2><p><strong>Android DID</strong>,全称是<strong>Android Device ID</strong>，及Android设备的唯一标识id。Android中系统中并没有可靠获取设备唯一id的方法，这个是业内的一种无奈，最主要的原因，应该是各家厂商以及不同的Android版本。</p>
+<a id="more"></a>
+<h3 id="一、设备动态获取信息"><a href="#一、设备动态获取信息" class="headerlink" title="一、设备动态获取信息"></a>一、设备动态获取信息</h3><p>昨天接到付款码需求，需要唯一确认设备id来做数据校验等操作。由于Android目前的问题，我们没有办法按照某一条设备值获取这条信息，那Android中，我们可以取的数据有哪些呢？</p>
+<h4 id="1-DEVICE-ID"><a href="#1-DEVICE-ID" class="headerlink" title="1. DEVICE_ID"></a>1. DEVICE_ID</h4><p>先说一下最常用的<strong>IMEI</strong> (International Mobile Equipment Identity)，国际移动设备身份码的缩写，国际移动装备辨识码，是由15位数字组成的“电子串号”，它与每台移动电话机一一对应，而且该码是全世界唯一的。每一只移动电话机在组装完成后都将被赋予一个全球唯一的一组号码，这个号码从生产到交付使用都将被制造生产的厂商所记录。</p>
+<p><strong>MEID</strong> 移动设备识别码(Mobile Equipment Identifier)是CDMA手机的身份识别码，也是每台CDMA手机或通讯平板唯一的识别码。通过这个识别码，网络端可以对该手机进行跟踪和监管。用于CDMA制式的手机。MEID的数字范围是十六进制的，和IMEI的格式类似</p>
+<p><strong>ESN</strong>是电子序列号Electronic Serial Number的缩写，CDMA网络术语，它是一个32bits长度的参数，它可唯一标识一台CDMA移动台设备，类似于GSM网络中的IMEI</p>
+<p>Android系统中通常用下面这段代码获取。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line">/**</div><div class="line"> * 获取手机IMEI号</div><div class="line"> * </div><div class="line"> * 需要动态权限: android.permission.READ_PHONE_STATE</div><div class="line"> */</div><div class="line">public static String getDeviceId(Context context) &#123;</div><div class="line">        TelephonyManager telephonyManager = (TelephonyManager) context.getSystemService(context.TELEPHONY_SERVICE);</div><div class="line">        String imei = telephonyManager.getDeviceId();</div><div class="line"></div><div class="line">        return imei;</div><div class="line">    &#125;</div></pre></td></tr></table></figure></p>
+<p>手机设备：手机制式为 GSM 时，返回手机的 IMEI 。手机制式为 CDMA 时，返回手机的 MEID 或 ESN。</p>
+<p>非手机设备：如平板电脑、电子书、电视、音乐播放器等。这些设备没有通话的硬件功能，系统中也就没有TELEPHONY_SERVICE，自然也就无法通过上面的方法获得DEVICE_ID，因此为null</p>
+<p>优点：</p>
+<ol>
+<li>全球设备唯一</li>
+<li>Android手机设备绝对有该值，且大于等于1（双卡设备可能有两个）</li>
+</ol>
+<p>缺点：</p>
+<ol>
+<li>获取需要权限，手机厂商会提醒用户是否赋予电话权限，360等第三方安全应用也会提醒拦截，Android系统在6.0版本之后加入了权限控制，默认进入APP之后都需要用户申请权限。</li>
+<li>厂商定制系统中存在bug,少数手机设备上，由于该实现有漏洞，会返回垃圾，如:zeros或者asterisks</li>
+</ol>
+<h4 id="2-IMSI"><a href="#2-IMSI" class="headerlink" title="2. IMSI"></a>2. IMSI</h4><p><strong>IMSI</strong> 国际移动用户识别码（IMSI：International Mobile Subscriber Identification Number）是区别移动用户的标志，储存在SIM卡中，可用于区别移动用户的有效信息。</p>
+<p>不同于手机设备的标识IMEI<br>：<strong>IMEI是与手机定</strong>绑的。<strong>IMSI是与SIM</strong>（Subscriber Identity Module，用户识别模块）<strong>或者USIM</strong>（Universal Subscriber Identity Module，全球用户身份模块）绑定的</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line">/**</div><div class="line"> * 获取手机IMSI号</div><div class="line"> * 需要动态权限: android.permission.READ_PHONE_STATE</div><div class="line"> */</div><div class="line"> public static String getIMSI(Context context)&#123;</div><div class="line">    TelephonyManager mTelephonyMgr = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);</div><div class="line">    String imsi = mTelephonyMgr.getSubscriberId();</div><div class="line"></div><div class="line">    return imsi ;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>优点：</p>
+<ol>
+<li>与用户的SIM卡绑定，可确认是某个运营商的客户。</li>
+</ol>
+<p>缺点：</p>
+<ol>
+<li>同样在获取方式上需要动态申请权限，与IMEI缺点相同。</li>
+<li>不能插入SIM卡的设备绝对获取不到，且需要用户插SIM卡是才能读取</li>
+</ol>
+<h4 id="MAC-ADDRESS"><a href="#MAC-ADDRESS" class="headerlink" title="MAC ADDRESS"></a>MAC ADDRESS</h4><p><strong>MAC（Media Access Control，介质访问控制）地址</strong>，也叫硬件地址，长度是48比特（6字节），由16进制的数字组成，分为前24位和后24位：<br>前24位叫做组织唯一标志符（Organizationally Unique Identifier，即OUI），是由IEEE的注册管理机构给不同厂家分配的代码，区分了不同的厂家。<br>后24位是由厂家自己分配的，称为扩展标识符。同一个厂家生产的网卡中MAC地址后24位是不同的。</p>
+<p>MAC地址对应于OSI参考模型的第二层数据链路层，工作在数据链路层的交换机维护着计算机MAC地址和自身端口的数据库，交换机根据收到的数据帧中的“目的MAC地址”字段来转发数据帧。</p>
+<p>Android中获取方法<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">WifiManager wifiManager=(WifiManager) getSystemService(Context.WIFI_SERVICE);</div><div class="line">WifiInfo wifiInfo=wifiManager.getConnectionInfo();</div><div class="line">String mac=wifiInfo.getMacAddress();</div></pre></td></tr></table></figure></p>
+<p>这种方法比较通用，但是最近在Android 6.0系统上，这个方法失效了，返回了”02:00:00:00:00:00”的常量。这并不是一个BUG，在google的博客中找到如下一段话：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">Most notably, Local WiFi and Bluetooth MAC addresses are no longer available. </div><div class="line">The getMacAddress() method of a WifiInfo object and the BluetoothAdapter.getDefaultAdapter().getAddress() method </div><div class="line">will both return 02:00:00:00:00:00 from now on.</div></pre></td></tr></table></figure></p>
+<p>因此我们支付、闪付、付款码各业务在在6.0以上设备做了获取方式的变更，但根据我参考的资料来说，android 7.0以上获取方式可能仍有变化，<a href="http://blog.csdn.net/chaozhung_no_l/article/details/78329371" target="_blank" rel="external">详情可点击链接</a>，由于手上没有7.0以及7.1、8.0系统的设备，详细情形待验证。</p>
+<p>优点：</p>
+<ol>
+<li>现有几乎每台移动设备都有WiFi和蓝牙功能，获取mac地址权限相对DeviceID简单</li>
+<li>大多数设备都开启过WiFi（国内应该没有不开WiFi的土豪，流量贵伤不起），因此可以获取该设备地址。</li>
+</ol>
+<p>缺点：</p>
+<ol>
+<li>如果重启手机后，Wifi没有打开过，是无法获取其Mac地址的，而蓝牙是只有在打开的时候才能获取到其Mac地址。（这个还好，可以考虑授予CHANGE_WIFI_STATE权限，开关一次wifi刷一下。）</li>
+<li>有一些定制系统的目录并不一样。 例如三星的目录为”cat /sys/class/net/eth0/address”，所以是否对所以机型都有效有待验证。（需要适配）</li>
+<li>网上也有反映mac变更问题，是不是刷mac或者wifi故障导致，也不确定。</li>
+<li>并不是所有的设备都有Wifi硬件，硬件不存在自然也就得不到这一信息。（这个还好）</li>
+<li>需要 ACCESS_WIFI_STATE 权限。（这个还好，不需要动态申请）</li>
+<li>极少数设备升级系统会变更mac地址（李轶哥反馈武小周有一台这样可爱的手机）</li>
+</ol>
+<h3 id="设备序列号（Serial-Number-SN）"><a href="#设备序列号（Serial-Number-SN）" class="headerlink" title="设备序列号（Serial Number, SN）"></a>设备序列号（Serial Number, SN）</h3><p>Android 硬件 设备序列号<br>获取办法：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">String serialNum = android.os.Build.SERIAL;</div></pre></td></tr></table></figure></p>
+<p>优点：</p>
+<ol>
+<li>Android 2.3可以获取，非手机设备可以通过该接口获取。</li>
+<li>不需要动态申请权限<br>缺点</li>
+<li>在少数的一些设备上，会返回垃圾数据（比例有多少，网上没有大规模的调研数据）。</li>
+</ol>
+<p>装有SIM卡的设备获取办法：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">getSystemService(Context.TELEPHONY_SERVIEC).getSimSerialNumber();</div></pre></td></tr></table></figure></p>
+<p>有文章说，该id就是IMEI,因此对于CMDA电信设备，获取数值为null</p>
+<h3 id="ANDROID-ID"><a href="#ANDROID-ID" class="headerlink" title="ANDROID_ID"></a>ANDROID_ID</h3><p>在设备首次启动时，系统会随机生成一个64位的数字，并把这个数字以16进制字符串的形式保存下来，这个16进制的字符串就是ANDROID_ID，当设备被恢复出厂设置后该值会被重置。</p>
+<p>可以通过下面的方法获取：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">import android.provider.Settings;   </div><div class="line">String ANDROID_ID = Settings.System.getString(getContentResolver(), Settings.System.ANDROID_ID);</div></pre></td></tr></table></figure></p>
+<p>优点：<br>1.android系统版本在非2.2系统上，都是非常可靠的<br>2.不需要获取权限<br>缺点：</p>
+<ol>
+<li>Android2.2系统上不可靠（还好，现在的设备基本都在4.0以上）</li>
+<li>厂商定制系统的Bug：不同的设备可能会产生相同的ANDROID_ID：9774d56d682e549c。(摩托罗拉好像出现过这个问题)</li>
+<li>厂商定制系统的Bug：有些设备返回的值为null</li>
+<li>设备差异：对于CDMA设备，ANDROID_ID和TelephonyManager.getDeviceId() 返回相同的值。</li>
+<li>如果某个Andorid手机被Root过的话，这个ID也可以被改变。</li>
+<li>刷机或者重置手机都会变化。</li>
+</ol>
+<h3 id="Installtion-ID"><a href="#Installtion-ID" class="headerlink" title="Installtion ID"></a>Installtion ID</h3><p>这种方式的原理是在程序安装后第一次运行时生成一个ID，该方式和设备唯一标识不一样，不同的应用程序会产生不同的ID，同一个程序重新安装也会不同。</p>
+<p>所以这不是设备的唯一ID，但是可以保证每个用户的ID是不同的。可以说是用来标识每一份应用程序的唯一ID（即Installtion ID），可以用来跟踪应用的安装数量等（其实就是UUID）。<br>获取方法：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div></pre></td><td class="code"><pre><div class="line">public class Installation &#123;  </div><div class="line">    private static String sID = null;  </div><div class="line">    private static final String INSTALLATION = &quot;INSTALLATION&quot;;  </div><div class="line">  </div><div class="line">    public synchronized static String id(Context context) &#123;  </div><div class="line">        if (sID == null) &#123;    </div><div class="line">            File installation = new File(context.getFilesDir(), INSTALLATION);  </div><div class="line">            try &#123;  </div><div class="line">                if (!installation.exists())  </div><div class="line">                    writeInstallationFile(installation);  </div><div class="line">                sID = readInstallationFile(installation);  </div><div class="line">            &#125; catch (Exception e) &#123;  </div><div class="line">                throw new RuntimeException(e);  </div><div class="line">            &#125;  </div><div class="line">        &#125;  </div><div class="line">        return sID;  </div><div class="line">    &#125;  </div><div class="line">  </div><div class="line">    private static String readInstallationFile(File installation) throws IOException &#123;  </div><div class="line">        RandomAccessFile f = new RandomAccessFile(installation, &quot;r&quot;);  </div><div class="line">        byte[] bytes = new byte[(int) f.length()];  </div><div class="line">        f.readFully(bytes);  </div><div class="line">        f.close();  </div><div class="line">        return new String(bytes);  </div><div class="line">    &#125;  </div><div class="line">  </div><div class="line">    private static void writeInstallationFile(File installation) throws IOException &#123;  </div><div class="line">        FileOutputStream out = new FileOutputStream(installation);  </div><div class="line">        String id = UUID.randomUUID().toString();  </div><div class="line">        out.write(id.getBytes());  </div><div class="line">        out.close();  </div><div class="line">    &#125;  </div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>优点：</p>
+<ol>
+<li>不需要权限</li>
+<li>每当一个应用安装后即可获得。<br>缺点</li>
+<li>删除应用重新安装后id变更。</li>
+</ol>
+<p>画个图总结下吧，看图</p>
+<table>
+<thead>
+<tr>
+<th>方式</th>
+<th>权限</th>
+<th>变化度</th>
+<th>可靠性</th>
+<th>可能的问题</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>DEVICE_ID</td>
+<td>申请</td>
+<td>很低低</td>
+<td>高</td>
+<td>6.0后动态申请用户感知度极高</td>
+</tr>
+<tr>
+<td>MAC ADDRESS</td>
+<td>不需要</td>
+<td>低</td>
+<td>高</td>
+<td>极少数设备取不到或者有变化</td>
+</tr>
+<tr>
+<td>IMSI</td>
+<td>申请</td>
+<td>低等（换卡）</td>
+<td>高</td>
+<td>动态申请用户感知度极高、且依赖用户插入卡</td>
+</tr>
+<tr>
+<td>Serial Number</td>
+<td>不需要</td>
+<td>待确认</td>
+<td>待确认</td>
+<td>少数设备脏数据</td>
+</tr>
+<tr>
+<td>AndroidID</td>
+<td>不需要</td>
+<td>待确认</td>
+<td>待确认</td>
+<td>厂商bug及重置手机后变更</td>
+</tr>
+<tr>
+<td>Installtion ID</td>
+<td>不需要</td>
+<td>待确认</td>
+<td>待确认</td>
+<td>并不是设备标识，是应用安装标识</td>
+</tr>
+</tbody>
+</table>
+<h3 id="二、设备静态信息"><a href="#二、设备静态信息" class="headerlink" title="二、设备静态信息"></a>二、设备静态信息</h3><h4 id="1-android-os-Build类"><a href="#1-android-os-Build类" class="headerlink" title="1. android.os.Build类"></a>1. android.os.Build类</h4><p>android.os.Build类中,包括了这样的一些信息。我们可以直接调用 而不需要添加任何的权限和方法。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div></pre></td><td class="code"><pre><div class="line">android.os.Build.BOARD：获取设备基板名称</div><div class="line">android.os.Build.BOOTLOADER:获取设备引导程序版本号</div><div class="line">android.os.Build.BRAND：获取设备品牌</div><div class="line">android.os.Build.CPU_ABI：获取设备指令集名称（CPU的类型）</div><div class="line">android.os.Build.CPU_ABI2：获取第二个指令集名称</div><div class="line">android.os.Build.DEVICE：获取设备驱动名称</div><div class="line">android.os.Build.DISPLAY：获取设备显示的版本包（在系统设置中显示为版本号）和ID一样</div><div class="line">android.os.Build.FINGERPRINT：设备的唯一标识。由设备的多个信息拼接合成。</div><div class="line">android.os.Build.HARDWARE：设备硬件名称,一般和基板名称一样（BOARD）</div><div class="line">android.os.Build.HOST：设备主机地址</div><div class="line">android.os.Build.ID:设备版本号。</div><div class="line">android.os.Build.MODEL ：获取手机的型号 设备名称。</div><div class="line">android.os.Build.MANUFACTURER:获取设备制造商</div><div class="line">android:os.Build.PRODUCT：整个产品的名称</div><div class="line">android:os.Build.RADIO：无线电固件版本号，通常是不可用的 显示unknown</div><div class="line">android.os.Build.TAGS：设备标签。如release-keys 或测试的 test-keys </div><div class="line">android.os.Build.TIME：时间</div><div class="line">android.os.Build.TYPE:设备版本类型  主要为&quot;user&quot; 或&quot;eng&quot;.</div><div class="line">android.os.Build.USER:设备用户名 基本上都为android-build</div><div class="line">android.os.Build.VERSION.RELEASE：获取系统版本字符串。如4.1.2 或2.2 或2.3等</div><div class="line">android.os.Build.VERSION.CODENAME：设备当前的系统开发代号，一般使用REL代替</div><div class="line">android.os.Build.VERSION.INCREMENTAL：系统源代码控制值，一个数字或者git hash值</div><div class="line">android.os.Build.VERSION.SDK：系统的API级别 一般使用下面大的SDK_INT 来查看</div><div class="line">android.os.Build.VERSION.SDK_INT：系统的API级别 数字表示</div></pre></td></tr></table></figure></p>
+<h4 id="2-build-prop中获取当前系统属性"><a href="#2-build-prop中获取当前系统属性" class="headerlink" title="2.  build.prop中获取当前系统属性"></a>2.  build.prop中获取当前系统属性</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div></pre></td><td class="code"><pre><div class="line">D:\AndroidStudio\sdk\platform-tools&gt;adb shell cat /system/build.prop</div><div class="line">ro.product.dmtklog=true</div><div class="line">ro.vivo.oem.support=yes</div><div class="line">persist.vivo.radio.type.abbr=A</div><div class="line">persist.vivo.radio.type.list=TD-SCDM</div><div class="line">ro.vivo.lcm.xhd=QDHD</div><div class="line">ro.sf.lcd_density=640</div><div class="line">ro.vivo.lte.voice.type=CSFB</div><div class="line">ro.vivo.net.entry=no</div><div class="line">ro.vivo.hardware.version=PD1522AMA</div><div class="line">ro.board.bbk=MA</div><div class="line">ro.vivo.product.solution=QCOM</div><div class="line">ro.vivo.product.platform=QCOM8976</div><div class="line">ro.vivo.board.version=MA</div><div class="line">ro.product.net.entry.bbk=no</div><div class="line">persist.vivo.product.cust.list=N</div><div class="line">persist.sys.strictmode.disable=true</div><div class="line"></div><div class="line">...</div></pre></td></tr></table></figure>
+<p>命令查看手中vivo手机信息，发现很多厂商定制信息，暂无找到需要的信息</p>
+<h3 id="三、阿里UTDID方案分析"><a href="#三、阿里UTDID方案分析" class="headerlink" title="三、阿里UTDID方案分析"></a>三、阿里UTDID方案分析</h3><p>接到该需求后，我询问了一些之前实验室的小伙伴们，一位在滴滴的学长和我提到了阿里的utdid，扔给了我一个jar包，并表示阿里集团就是这么用的，你反编译下自己写一份~</p>
+<p>二话不说，我去反编译，结果该jar包混淆做的比较好，几乎无法分析，于是求之于百度，<a href="http://blog.csdn.net/justFWD/article/details/50549971" target="_blank" rel="external">阿里系UTDID库生成唯一性ID分析</a>。</p>
+<p>utdid方案核心逻辑为在外置SD卡中生成一段数字,其算法可分为三部分连接</p>
+<ol>
+<li>时间戳 System.currentTimeMillis()/1000</li>
+<li>DEVICE_ID,若因权限等问题获取不到，则生成随机值Random</li>
+<li>随机值Random</li>
+</ol>
+<p>该方案为友盟SDK主导设计，具体使用场景为各个APP嵌入友盟SDK，utdid可以在多个APP中进行维护，在使用的有友盟、虾米音乐、阿里小智、老版本的支付宝、淘宝等。</p>
+<p>优点：</p>
+<ol>
+<li><p>多APP维护该设备id，并且在多应用中可以维护<br>缺点：<br>utdid开发手册中是强制需要下面3个权限的：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">&lt;uses-permission android:name=&quot;android.permission.WRITE_EXTERNAL_STORAGE&quot; /&gt; </div><div class="line">&lt;uses-permission android:name=&quot;android.permission.WRITE_SETTINGS&quot; /&gt; </div><div class="line">&lt;uses-permission android:name=&quot;android.permission.READ_PHONE_STATE&quot; /&gt;</div></pre></td></tr></table></figure>
+</li>
+<li><p><strong>WRITE_SETTINGS</strong><br>targetSDK使用23(6.0)以后，即使申请了WRITE_SETTINGS权限，再想写settings中的数据会抛出了如下异常。<br>IllegalArgumentException: You cannot keep your settings in the secure settings.<br>想写Setting.System中的数据也已经没有权限了，即使想修改Settings.Global也需要是系统应用。</p>
+</li>
+<li><strong>READ_PHONE_STATE</strong><br>targetSDK使用23以后，需要手动授权。imei作为utdid生成字段的其中一部分，在生成utdid时，如果无法获取就使用随机值代替。这个即使不授权问题也不大。</li>
+<li><strong>WRITE_EXTERNAL_STORAGE</strong><br>targetSDK使用23以后，需要手动授权。在settings中没有写入utdid的情况下，如果没有WRITE_EXTERNAL_STORAGE权限，应用外部的utdid是无法获得的，内部也没有的情况下，那么utdid势必会重新生成了。</li>
+<li>如果settings不能保存，那么应用外就需要寄希望于sdcard的存储。除了权限问题会导致sdcard中的数据无法取得外，三方的手机管理工具也会对sdcard中的数据做清除。（utdid外存储目录用AAA，BBB表示）</li>
+</ol>
+<h3 id="四、总结"><a href="#四、总结" class="headerlink" title="四、总结"></a>四、总结</h3><p>在Android中，基本上没有绝对可靠的数据可以获取，但昨天和释翔哥、轶哥、学贤哥的讨论，我们可以在下个版本上传以Wifi Mac地址、设备序列号、ANDROID_ID为主要基准，配合android.os.Build中手机基本信息为参考，DEVICE_ID（用READ_PHONE_STATE权限做修正）等。如果可以的话，还可以参考手机号码、pin等数据做修正，如果修正后的数据仍无法满足，那我们可以针对这部分用户做增验等异常流程设计。</p>
+<p>这些是我个人之前的一些经验和总结，若大家有其他方案或者有我有哪些遗漏和错误，烦请大家指出，谢谢啦。</p>
+<p><strong>Refer</strong></p>
+<blockquote>
+<p><a href="https://baike.baidu.com/item/IMEI/1626447?fr=aladdin" target="_blank" rel="external">https://baike.baidu.com/item/IMEI/1626447?fr=aladdin</a><br><a href="https://baike.baidu.com/item/MEID/408369" target="_blank" rel="external">https://baike.baidu.com/item/MEID/408369</a><br><a href="http://blog.csdn.net/qq524752841/article/details/42421783" target="_blank" rel="external">http://blog.csdn.net/qq524752841/article/details/42421783</a><br><a href="http://blog.csdn.net/zhangcanyan/article/details/52817866" target="_blank" rel="external">http://blog.csdn.net/zhangcanyan/article/details/52817866</a><br><a href="http://blog.csdn.net/aa1733519509/article/details/50053553" target="_blank" rel="external">http://blog.csdn.net/aa1733519509/article/details/50053553</a></p>
+</blockquote>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+      <div>
+        <div style="padding: 10px 0; margin: 20px auto; width: 90%; text-align: center;">
+  <div>小主，求您多少赏点儿~</div>
+  <button id="rewardButton" disable="enable" onclick="var qr = document.getElementById('QR'); if (qr.style.display === 'none') {qr.style.display='block';} else {qr.style.display='none'}">
+    <span>小主赞赏</span>
+  </button>
+  <div id="QR" style="display: none;">
+
+    
+      <div id="wechat" style="display: inline-block">
+        <img id="wechat_qr" src="/images/weixin_pay.png" alt="KK葫芦娃 wechat"/>
+        <p>微信支付</p>
+      </div>
+    
+
+    
+      <div id="alipay" style="display: inline-block">
+        <img id="alipay_qr" src="/images/zhifubao_pay.png" alt="KK葫芦娃 Alipay"/>
+        <p>支付宝</p>
+      </div>
+    
+
+    
+      <div id="bitcoin" style="display: inline-block">
+        <img id="bitcoin_qr" src="/images/jd_pay.png" alt="KK葫芦娃 Bitcoin"/>
+        <p>京东支付</p>
+      </div>
+    
+
+  </div>
+</div>
+
+      </div>
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Android/" rel="tag"># Android</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/10/30/2017-10-30-换组/" rel="next" title="2017-10-30-换组">
+                <i class="fa fa-chevron-left"></i> 2017-10-30-换组
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar.jpg"
+               alt="KK葫芦娃" />
+          <p class="site-author-name" itemprop="name">KK葫芦娃</p>
+           
+              <p class="site-description motion-element" itemprop="description">山水天地之间</p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives/">
+                <span class="site-state-item-count">6</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">3</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/kkhuluwa" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                    
+                      GitHub
+                    
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://weibo.com/zzt789" target="_blank" title="新浪微博">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                    
+                      新浪微博
+                    
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Android-DID-问题"><span class="nav-number">1.</span> <span class="nav-text">Android DID 问题</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#一、设备动态获取信息"><span class="nav-number">1.1.</span> <span class="nav-text">一、设备动态获取信息</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1-DEVICE-ID"><span class="nav-number">1.1.1.</span> <span class="nav-text">1. DEVICE_ID</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-IMSI"><span class="nav-number">1.1.2.</span> <span class="nav-text">2. IMSI</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#MAC-ADDRESS"><span class="nav-number">1.1.3.</span> <span class="nav-text">MAC ADDRESS</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#设备序列号（Serial-Number-SN）"><span class="nav-number">1.2.</span> <span class="nav-text">设备序列号（Serial Number, SN）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#ANDROID-ID"><span class="nav-number">1.3.</span> <span class="nav-text">ANDROID_ID</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Installtion-ID"><span class="nav-number">1.4.</span> <span class="nav-text">Installtion ID</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#二、设备静态信息"><span class="nav-number">1.5.</span> <span class="nav-text">二、设备静态信息</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1-android-os-Build类"><span class="nav-number">1.5.1.</span> <span class="nav-text">1. android.os.Build类</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-build-prop中获取当前系统属性"><span class="nav-number">1.5.2.</span> <span class="nav-text">2.  build.prop中获取当前系统属性</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#三、阿里UTDID方案分析"><span class="nav-number">1.6.</span> <span class="nav-text">三、阿里UTDID方案分析</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#四、总结"><span class="nav-number">1.7.</span> <span class="nav-text">四、总结</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">KK葫芦娃</span>
+
+  
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-area-chart"></i>
+    </span>
+    
+      <span class="post-meta-item-text">站点总字数&#58;</span>
+    
+    <span title="站点总字数">
+      10.6k
+    </span>
+  
+</div>
+
+
+  <div class="powered-by">
+    由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+  </div>
+
+  <span class="post-meta-divider">|</span>
+
+  <div class="theme-info">
+    主题 &mdash;
+    <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+      NexT.Gemini
+    </a>
+  </div>
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.2"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.2"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.2"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.2"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.2"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.2"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.2"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
